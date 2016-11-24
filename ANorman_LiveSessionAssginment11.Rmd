@@ -1,0 +1,108 @@
+---
+title: "Live Session Assignment 11"
+author: "Alex Norman"
+date: "November 22, 2016"
+output: 
+        html_document:
+        keep_md: yes
+---
+ 
+## Live Session Assignment 11
+
+This is an R markdown of Live Session Assignment 11. Live Session Assignment 11 is using the ukcars data set within R, and applying the code given to us to answer the following questions about the data set. 
+
+#Libraries
+```{r warning=FALSE, message=FALSE } 
+library(fpp)
+```
+
+# Analysis
+
+## Plot the time series. Can you identify seasonal fluctuations and/or a trend?  
+```{r  }
+data(ukcars)
+plot(ukcars)
+
+```
+
+Yes there is both seasonal fluctuations and a trend. The seasonally fluctuations are shown from the sharp peaks and valleys of the graph. There seems to a high point once each each and also a low point each year.  The trend is shown by the more spaced out peaks and valleys mainly seen by the decrease from 1970s to 1980s, the increase from 1985 to 2000 and a slight decrease after 2000. 
+
+## Use a classical decomposition to calculate the trend-cycle and seasonal indices. 
+```{r  }
+fitd <- decompose(ukcars)
+```
+ 
+## Do the results support the graphical interpretation from part (a)? 
+```{r  } 
+plot(fitd)
+
+```
+
+Yes the results support exactly what was interpreted in part a. If you look at the trend graph you can see that there is a decrease in UK cars observed from the late 1970s to 1980,then there is a steady incline from 1980s to 2000 and finally a slight decline after 2000. If you look at the seasonal graph you can see that at the beginning of every year there is a spike and then it decreases till the middle of the year and then starts to increase back to the peak at the beginning of the following year.
+ 
+## Compute and plot the seasonally adjusted data. 
+```{r  }
+ukadj <- seasadj(fitd)
+plot(ukadj) 
+
+```
+ 
+## Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier? 
+```{r  }
+#Creating the outlier at the 57th point in the data set by adding 500 to its value
+ukcars2 <- ts(c(ukcars[1:56],ukcars[57]+500,ukcars[58:113]),start=c(1977,1),frequency=4)
+plot(ukcars2)
+#Decomposing to calculate the trend-cycle and seasonal indices
+fitd2 <- decompose(ukcars2)
+plot(fitd2)
+#Computing the seasonally adjusted data
+ukadj2 <- seasadj(fitd2)
+plot(ukadj2) 
+
+```
+
+The outlier does not necessarily effect the entire graph, but it does effect the point in which I assigned to be an outlier. Now you will see a spike towards the middle of the graph. This point is now 500 uk cars higher than it is in the original data set.  
+
+## Does it make any difference if the outlier is near the end rather than in the middle of the time series? 
+```{r  }
+#Creating an outlier at the beginning of the data set 
+ukcars2begin <- ts(c(ukcars[1]+500, ukcars[2:113]),start=c(1977,1),frequency=4)
+plot(ukcars2begin)
+#Decomposing to calculate the trend-cycle and seasonal indices for the outlier in the beginning
+fitd2begin <- decompose(ukcars2begin) 
+#Computing the seasonally adjusted data with the outlier at the beginning
+eeadj2begin <- seasadj(fitd2begin)
+plot(eeadj2begin)
+#Creating an outlier at the middle of the data set
+ukcars2middle <- ts(c(ukcars[1:56], ukcars[57]+500, ukcars[58:113]), start=c(1977,1), frequency=4)
+plot(ukcars2middle)
+#Decomposing to calculate the trend-cycle and seasonal indices for the outlier in the middle
+fitd2middle <- decompose(ukcars2middle) 
+#Computing the seasonally adjusted data with the outlier at the middle
+eeadj2middle <- seasadj(fitd2middle)
+plot(eeadj2middle)
+#Creating an outlier at the end of the data set
+ukcars2end <- ts(c(ukcars[1:112], ukcars[113]+500), start=c(1977,1), frequency = 4)
+plot(ukcars2end)
+#Decomposing to calculate the trend-cycle and seasonal indices for the outlier in the end
+fitd2end <- decompose(ukcars2end) 
+#Computing the seasonally adjusted data with the outlier at the end
+eeadj2end <- seasadj(fitd2end)
+plot(eeadj2end)
+
+```
+
+Although the graphs look different the overall graph is the same. The only real  difference between these graphs is where that point is located. If you set the outlier to the same amount (adding 500) the average of this data set will still be the same, but the median would be different if you set that outlier in the middle of the data set.  
+ 
+## Use STL to decompose the series
+```{r  }
+fit <- stl(ukcars, s.window=5)
+plot(fit)
+plot(ukcars, col="purple",
+     main="UK Passenger Vehicle  Production",
+     ylab="Thousands of cars", xlab="Year")
+lines(fit$time.series[,2],col="blue",ylab="Trend")
+
+```
+
+The purple line is the data set and the blue line is a graph of the trend.
